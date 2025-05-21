@@ -9,7 +9,7 @@ import UIKit
 import RxSwift
 import SnapKit
 
-class Onboarding2ViewController: UIViewController {
+class Onboarding2ViewController: GradientBackgroundViewController {
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "그 분의 이름을 적어주세요."
@@ -27,7 +27,8 @@ class Onboarding2ViewController: UIViewController {
     private let startButton: UIButton = {
         let button = UIButton()
         button.setTitle("시작하기", for: .normal)
-        button.backgroundColor = UIColor(named: "LabelColor3")
+        button.backgroundColor = UIColor.white
+        button.setTitleColor(UIColor(named: "LabelColor3"), for: .normal) 
         return button
     } ()
     

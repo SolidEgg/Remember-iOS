@@ -212,10 +212,10 @@ class JoinViewController: GradientBackgroundViewController {
                 let email = self.emailTextField.text ?? ""
                 let password = self.passwordTextField.text ?? ""
                 
-                let tempUserInfo = TempUserInfo(nickname: nickname, email: email, password: password, farewellTarget: "")
+                let tempUserInfo = TempUserInfo(nickname: nickname, email: email, password: password)
                 
                 let onboardingVC = OnboardingViewController()
-                onboardingVC.tempUserInfo = self.tempUserInfo
+                onboardingVC.tempUserInfo = tempUserInfo
                 self.navigationController?.pushViewController(onboardingVC, animated: true)
             })
             .disposed(by: disposeBag)

@@ -9,9 +9,12 @@ import UIKit
 import RxSwift
 import SnapKit
 import Realm
+import RxGesture
 
 class OnboardingViewController: GradientBackgroundViewController {
     var tempUserInfo: TempUserInfo?
+    private var selectedStackView: UIStackView?
+    private let disposeBag = DisposeBag()
     private let titleLabel: UILabel = {
         let label = UILabel()
         label.text = "누구와 작별했나요?"
@@ -21,14 +24,14 @@ class OnboardingViewController: GradientBackgroundViewController {
     
     private let targetLabel: UILabel = {
         let label = UILabel()
-        label.text = "친구,강아지,가족..."
+        label.text = "친구,반려동물,가족..."
         label.textColor = UIColor.white
         return label
     } ()
     
     private lazy var target1Stack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [
-            makeTargetStack(image: UIImage(named: "targetPet"), labelText: "강아지"),
+            makeTargetStack(image: UIImage(named: "targetPet"), labelText: "반려동물"),
             makeTargetStack(image: UIImage(named: "targetFreind"), labelText: "친구")
         ])
         stack.axis = .horizontal
@@ -48,7 +51,6 @@ class OnboardingViewController: GradientBackgroundViewController {
         return stack
     }()
 
-
     private lazy var targetContainerStack: UIStackView = {
         let stack = UIStackView(arrangedSubviews: [target1Stack, target2Stack])
         stack.axis = .vertical
@@ -60,7 +62,8 @@ class OnboardingViewController: GradientBackgroundViewController {
     private let nextButton: UIButton = {
         let button = UIButton()
         button.setTitle("다음", for: .normal)
-        button.backgroundColor = UIColor(named: "LabelColor3")
+        button.backgroundColor = UIColor.white
+        button.setTitleColor(UIColor(named: "LabelColor3"), for: .normal) 
         button.layer.cornerRadius = 16
         return button
     }()
@@ -69,7 +72,9 @@ class OnboardingViewController: GradientBackgroundViewController {
         let imageView = UIImageView()
         imageView.image = image
         imageView.contentMode = .scaleAspectFit
-
+        imageView.layer.cornerRadius = 8
+        imageView.clipsToBounds = true
+        
         let label = UILabel()
         label.text = labelText
         label.textColor = .white
@@ -80,12 +85,21 @@ class OnboardingViewController: GradientBackgroundViewController {
         stack.axis = .vertical
         stack.spacing = 8
         stack.alignment = .center
+        stack.isUserInteractionEnabled = true
+        stack.layer.borderWidth = 0
+        stack.layer.cornerRadius = 12
+        stack.layer.borderColor = UIColor.white.cgColor
 
         imageView.snp.makeConstraints { make in
             make.width.height.equalTo(135)
         }
+
+        // labelText를 tag로 임시 저장 (또는 accessibilityIdentifier를 사용해도 됨)
+        stack.accessibilityLabel = labelText
+
         return stack
     }
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -123,8 +137,52 @@ class OnboardingViewController: GradientBackgroundViewController {
         }
     }
     
+    private func handleTargetSelection(_ stack: UIStackView) {
+        selectedStackView?.layer.borderWidth = 0
+
+        stack.layer.borderWidth = 2
+        stack.layer.borderColor = UIColor.white.cgColor
+        selectedStackView = stack
+
+        if let label = stack.arrangedSubviews.last as? UILabel {
+            tempUserInfo?.farewellTarget = label.text ?? ""
+            print("선택된 대상: \(tempUserInfo?.farewellTarget ?? "")")
+        }
+    }
+
     private func bindUI() {
+        let allStacks = target1Stack.arrangedSubviews + target2Stack.arrangedSubviews
         
+        for stack in allStacks {
+            guard let targetStack = stack as? UIStackView else { continue }
+
+            targetStack.rx
+                .tapGesture()
+                .when(.recognized)
+                .subscribe(onNext: { [weak self] _ in
+                    self?.handleTargetSelection(targetStack)
+                })
+                .disposed(by: disposeBag)
+        }
+        
+        nextButton.rx.tap
+            .subscribe(onNext: { [weak self] in
+                guard let self = self else { return }
+                guard let target = self.tempUserInfo?.farewellTarget, !target.isEmpty else {
+                    print("작별 대상을 선택해주세요")
+                    return
+                }
+                // 다음 뷰로 이동
+                print("선택된 대상: \(target)")
+                let tabBarController = TabBarController()
+
+                if let sceneDelegate = UIApplication.shared.connectedScenes.first?.delegate as? SceneDelegate {
+                    sceneDelegate.window?.rootViewController = tabBarController
+                    sceneDelegate.window?.makeKeyAndVisible()
+                }
+
+            })
+            .disposed(by: disposeBag)
     }
     
 }
