@@ -150,6 +150,7 @@
 		589946742D72CB0800E6715B /* remember */ = {
 			isa = PBXGroup;
 			children = (
+				58E887F42DDF3F2000B10C10 /* Model */,
 				589946CB2DC386E600E6715B /* App */,
 				589946A52D73313000E6715B /* VC */,
 				589946792D72CB0800E6715B /* ViewController.swift */,
@@ -204,8 +205,6 @@
 			isa = PBXGroup;
 			children = (
 				589946BC2DBA66E600E6715B /* GradientBackgroundViewController.swift */,
-				589946C92DC3623700E6715B /* MessageObject.swift */,
-				58E887EB2DD0679200B10C10 /* User.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -217,6 +216,15 @@
 				589946752D72CB0800E6715B /* AppDelegate.swift */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		58E887F42DDF3F2000B10C10 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				589946C92DC3623700E6715B /* MessageObject.swift */,
+				58E887EB2DD0679200B10C10 /* User.swift */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
