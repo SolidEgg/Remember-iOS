@@ -20,13 +20,9 @@ class TabBarController: UITabBarController {
     }
     private func setupTabBar() {
         let homeVC = HomeViewController()
-        homeVC.view.backgroundColor = .white
         let searchVC = MyLetterViewController()
-        searchVC.view.backgroundColor = .white
-        let chatVC = UIViewController()
-        chatVC.view.backgroundColor = .white
+        let chatVC = CommunityViewController()
         let profileVC = MyPageViewController()
-        profileVC.view.backgroundColor = .white
         
         homeVC.tabBarItem = UITabBarItem(title: "", image: UIImage(named: "home")?.withRenderingMode(.alwaysOriginal), selectedImage: UIImage(named: "homeClick")?.withRenderingMode(.alwaysOriginal))
         

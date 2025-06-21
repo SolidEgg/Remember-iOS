@@ -18,8 +18,8 @@ class MyPageViewController: GradientBackgroundViewController {
     private let underlineView = UIView()
     
     private let accountSection = MyPageSectionView(
-        title: "계정",
-        items: ["닉네임 변경", "비밀번호 변경", "내가 쓴 편지"]
+        title: "TODO LIST",
+        items: ["방청소 하기","공원 30초 걷기","카페가서 커피 한 잔"]
     )
     
     private let calendarSection = MyPageLinkSectionView(
@@ -28,13 +28,13 @@ class MyPageViewController: GradientBackgroundViewController {
     )
     
     private let todoSection = MyPageLinkSectionView(
-        title: "투두 리스트",
+        title: "내가 작성한 편지",
         buttonTitle: "보러가기"
     )
     
     private let otherSection = MyPageSectionView(
         title: "기타",
-        items: ["로그아웃", "회원탈퇴"]
+        items: ["로그아웃", "회원탈퇴","고객센터"]
     )
 
     override func viewDidLoad() {

@@ -23,16 +23,15 @@ class MyLetterViewController: GradientBackgroundViewController {
     private let dateLabel = UILabel()
     private let tableView = UITableView()
     private let underlineView = UIView()
+    private let lettersRelay = BehaviorRelay<[MessageObject]>(value: [])
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(hex: "#302f4c")
-        
         setupUI()
         setupBindings()
-        setupBlurEllipse()
-        tableView.dataSource = self
-        tableView.delegate = self
+        bindTableView()
+
     }
 
     private func setupUI() {
@@ -59,7 +58,8 @@ class MyLetterViewController: GradientBackgroundViewController {
         tableView.register(LetterCell.self, forCellReuseIdentifier: "LetterCell")
         tableView.backgroundColor = .clear
         tableView.separatorStyle = .none
-        tableView.estimatedRowHeight = 100
+        tableView.rowHeight = 120
+        tableView.estimatedRowHeight = 120
         tableView.rowHeight = UITableView.automaticDimension
         
         view.addSubview(tableView)
@@ -78,49 +78,6 @@ class MyLetterViewController: GradientBackgroundViewController {
         dateLabel.text = formatter.string(from: Date())
     }
     
-    private func setupBlurEllipse() {
-        let ellipseIcon1 = UIImageView(image: UIImage(named: "elipseIcon1"))
-        ellipseIcon1.contentMode = .scaleAspectFill
-        view.addSubview(ellipseIcon1)
-        
-        ellipseIcon1.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(306)
-            make.top.equalToSuperview().offset(612)
-            make.width.height.equalTo(62)
-        }
-        
-        // 🔹 "elipse_icon_2" 추가 (위치: x: 0, y: 0, width: 62, height: 62)
-        let ellipseIcon2 = UIImageView(image: UIImage(named: "elipseIcon2"))
-        ellipseIcon2.contentMode = .scaleAspectFill
-        view.addSubview(ellipseIcon2)
-        
-        ellipseIcon2.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(0)
-            make.top.equalToSuperview().offset(0)
-            make.width.height.equalTo(260)
-        }
-        
-        let ellipseIcon3 = UIImageView(image: UIImage(named: "elipseIcon3"))
-        ellipseIcon3.contentMode = .scaleAspectFill
-        view.addSubview(ellipseIcon3)
-        
-        ellipseIcon3.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(100)
-            make.top.equalToSuperview().offset(60)
-            make.width.height.equalTo(358)
-        }
-        
-        let ellipseIcon4 = UIImageView(image: UIImage(named: "elipseIcon4"))
-        ellipseIcon4.contentMode = .scaleAspectFill
-        view.addSubview(ellipseIcon4)
-        
-        ellipseIcon4.snp.makeConstraints { make in
-            make.left.equalToSuperview().offset(-100)
-            make.bottom.equalToSuperview().offset(100)
-            make.width.height.equalTo(358)
-        }
-    }
-    
     func saveLetter(date: Date, content: String) {
         let letter = MessageObject()
         letter.date = date
@@ -135,8 +92,16 @@ class MyLetterViewController: GradientBackgroundViewController {
     private func loadLetters() {
         let realm = try! Realm()
         let results = realm.objects(MessageObject.self).sorted(byKeyPath: "date", ascending: false)
-        self.letters = Array(results)
-        self.tableView.reloadData()
+        lettersRelay.accept(Array(results))
+    }
+
+    private func bindTableView() {
+        tableView.delegate = self
+        lettersRelay
+            .bind(to: tableView.rx.items(cellIdentifier: "LetterCell", cellType: LetterCell.self)) { row, letter, cell in
+                cell.configure(with: letter)
+            }
+            .disposed(by: disposeBag)
     }
 
 }
